@@ -23,14 +23,20 @@ el = \tag -> \content ->
   "<" <> tag <> ">" <> content <> "</" <> tag <> ">"
 
 p_ :: String -> Structure
-p_ = Structure . el "p"
+p_ = Structure . el "p" . escape
 
 h1_ :: String -> Structure
-h1_ = Structure . el "h1"
+h1_ = Structure . el "h1" . escape
 
 html_ :: Title -> Structure -> Html
 html_ title content =
-  Html (el "html" (el "head" (el "title" title) <> el "body" (getStructureString content)))
+  Html
+    ( el
+        "html"
+        ( el "head" (el "title" (escape title))
+            <> el "body" (getStructureString content)
+        )
+    )
 
 p' :: String -> Structure
 p' = Structure . el "p"
@@ -55,3 +61,15 @@ getStructureString :: Structure -> String
 getStructureString content =
   case content of
     Structure str -> str
+
+escape :: String -> String
+escape =
+  let escapeChar c =
+        case c of
+          '<' -> "&lt;"
+          '>' -> "&gt;"
+          '&' -> "&amp;"
+          '"' -> "&quot;"
+          '\'' -> "&#39;"
+          _ -> [c]
+   in concat . map escapeChar
