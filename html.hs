@@ -1,42 +1,23 @@
+-- html.hs
+newtype Html = Html String
+
+newtype Structure = Structure String
+
+type Title = String
+
 el :: String -> String -> String
 el = \tag -> \content ->
   "<" <> tag <> ">" <> content <> "</" <> tag <> ">"
 
-wrapHtml :: String -> String
-wrapHtml content = "<html><body>" ++ content ++ "</body></html>"
+p_ :: String -> Structure
+p_ = Structure . el "p"
 
-html_ :: String -> String
-html_ = el "html"
+h1_ :: String -> Structure
+h1_ = Structure . el "h1"
 
-body_ :: String -> String
-body_ = el "body"
-
-p_ :: String -> String
-p_ = el "p"
-
-h1_ :: String -> String
-h1_ = el "h1"
-
-head_ :: String -> String
-head_ content = "<head>" <> content <> "</head>"
-
-title_ :: String -> String
-title_ content = "<title>" <> content <> "</title>"
-
-makeHtml :: String -> String -> String
-makeHtml t c = html_ ((head_ (title_ t)) <> (body_ c))
-
-richerHtml t c para = html_ ((head_ (title_ (h1_ t))) <> (body_ (c) <> (p_ para)))
-
-myhtml :: String
--- myhtml = makeHtml "Hello World Title" "Neki Neki content!"
-myhtml = richerHtml "Hello World Title" "Neki Neki content!" "In a paragraph"
-
-add_ = \a -> \b -> a + b
-
-newtype Html = Html String
-
-newtype Structure = Structure String
+html_ :: Title -> Structure -> Html
+html_ title content =
+  Html (el "html" (el "head" (el "title" title) <> el "body" (getStructureString content)))
 
 p' :: String -> Structure
 p' = Structure . el "p"
@@ -46,5 +27,18 @@ getStructure struct =
   case struct of
     Structure str -> str
 
-main :: IO ()
-main = putStrLn myhtml
+dot_ :: (b -> c) -> (a -> b) -> a -> c
+dot_ f g x = f (g x)
+
+append_ :: Structure -> Structure -> Structure
+append_ s1 s2 = Structure (getStructureString s1 <> getStructureString s2)
+
+render :: Html -> String
+render html =
+  case html of
+    Html str -> str
+
+getStructureString :: Structure -> String
+getStructureString content =
+  case content of
+    Structure str -> str
