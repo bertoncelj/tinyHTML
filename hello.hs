@@ -14,3 +14,7 @@ myhtml =
             (p_ "Paragraph2")
         )
     )
+
+haihi = [p_ "neki", p_ "jaja", p_ "tine"]
+
+test_new_ul = ul_ haihi
